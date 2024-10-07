@@ -1,0 +1,9 @@
+# ****************************************************
+# Synapse C++ Library
+# Root
+# '.gitignore'
+# Author: jcjuarez
+# This source code is licensed under the MIT license.
+# ****************************************************
+
+.vscode/
