@@ -8,16 +8,18 @@
 
 #pragma once
 
-#include <atomic>
 #include <format>
+#include <memory>
 #include <cassert>
+#include <shared_mutex>
 #include "log_level.hh"
-#include "logging_engine.hh"
 #include "../status/status.hh"
 #include "logger_configuration.hh"
 
 namespace syp
 {
+
+class logging_engine;
 
 //
 // Logger singleton class for managing logging in the system.
@@ -26,6 +28,13 @@ class logger
 {
     
 public:
+
+    //
+    // Gets the logger initialization status.
+    //
+    static
+    auto
+    is_logger_initialized() -> bool;  
 
     //
     // Initializes singleton logger instance.
@@ -44,9 +53,7 @@ public:
     log(
         const log_level& p_log_level,
         const char* p_title,
-        const std::string&& p_message,
-        status_code* p_status = nullptr,
-        const logger_configuration* p_logger_configuration = nullptr) -> void;
+        const std::string&& p_message) -> void;
 
     //
     // Flushes the current contents of the memory buffer to the filesystem.
@@ -55,36 +62,80 @@ public:
     auto
     flush() -> void;
 
-    //
-    // Gets the logger initialization status.
-    //
-    static
-    auto
-    is_logger_initialized() -> bool;  
-
 private:
 
     //
-    // Constructor for the singleton instance. Internal use only.
+    // Constructor for the singleton logger instance.
     //
     logger();
 
     //
-    // Initializes the singleton logger instance. Internal use only.
+    // Gets the logger initialization status.
+    //
+    auto
+    is_logger_initialized() -> bool;  
+
+    //
+    // Initializes the singleton logger instance.
     //
     auto
     initialize(
-        const logger_configuration* p_logger_configuration) -> status_code;
+        const logger_configuration& p_logger_configuration) -> status_code;
+
+    //
+    // Logs a message through the singleton logger instance.
+    //
+    auto
+    log(
+        const log_level& p_log_level,
+        const char* p_title,
+        const char* p_message) -> void;
+
+    //
+    // Gets and constructs the singleton logger instance by lazy initialization.
+    //
+    static
+    auto
+    get_logger() -> logger&;
+
+    //
+    // Logs a message to the standard error stream and syslog.
+    // Not thread-safe; caller responsible for synchronization.
+    //
+    static
+    auto
+    log_error_fallback(
+        const char* p_title,
+        const char* p_message) -> void;
+
+    //
+    // Logs a message to the standard error stream.
+    // Not thread-safe; caller responsible for synchronization.
+    //
+    static
+    auto
+    log_error_to_console(
+        const char* p_message) -> void;
+
+    //
+    // Logs a message to syslog.
+    // Not thread-safe; caller responsible for synchronization.
+    //
+    static
+    auto
+    log_error_to_syslog(
+        const char* p_title,
+        const char* p_message) -> void;
 
     //
     // Logging engine used to handle logs dispatching.
     //
-    logging_engine m_logging_engine;
+    std::unique_ptr<logging_engine> m_logging_engine;
 
     //
-    // Flag for determining if the singleton instance is initialized.
+    // Lock for handling access synchronization to the object.
     //
-    static std::atomic<bool> s_initialized;
+    mutable std::shared_mutex m_lock;
 
 };
 

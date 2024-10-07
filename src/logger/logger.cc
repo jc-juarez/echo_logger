@@ -8,118 +8,162 @@
 
 #pragma once
 
+#include <mutex>
+#include <string>
+#include <iostream>
+#include <syslog.h>
 #include "logger.hh"
+#include "logging_engine.hh"
 
 namespace syp
 {
 
-std::atomic<bool> logger::s_initialized = false;
+auto
+logger::is_logger_initialized() -> bool
+{
+    return get_logger().is_logger_initialized();
+}
 
 auto
 logger::initialize(
     logger_configuration* p_logger_configuration) -> status_code
 {
-    if (s_initialized)
-    {
-        log_critical_message("SynapseLogger",
-            "The synapse logger has already been initialized.");
-
-        return status::logger_already_initialized;
-    }
-
     logger_configuration default_logger_configuration;
 
     if (p_logger_configuration == nullptr)
     {
         //
-        // No custom configuration was provided; use the default values.
+        // No custom configuration was provided; use the default settings.
         //
         p_logger_configuration = &default_logger_configuration;
     }
 
-    status_code status {status::success};
-
-    //
-    // In the initialize path, the logger
-    // configuration should never be nullptr.
-    //
-    log(log_level::info,
-        "SynapseLogger",
-        "The synapse logger has been successfully initialized.",
-        &status,
-        p_logger_configuration);
-
-    return status;
+    return get_logger().initialize(*p_logger_configuration);
 }
 
 auto
 logger::log(
     const log_level& p_log_level,
     const char* p_title,
-    const std::string&& p_message,
-    status_code* p_status = nullptr,
-    const logger_configuration* p_logger_configuration) -> void
+    const std::string&& p_message) -> void
 {
-    if (!s_initialized &&
-        p_logger_configuration == nullptr)
-    {
-        //
-        // Log error using fallback mechanism.
-        // Thread-safety not guaranteed at this point.
-        //
-        // log_error_fallback();
-
-        *p_status = status::logger_not_initialized;
-        return;
-    }
-
-    static logger logger_singleton_instance;
-
-    if (!s_initialized)
-    {
-        status_code status = logger_singleton_instance.initialize(p_logger_configuration);
-
-        if (status::failed(status))
-        {
-            //
-            // Log error using fallback mechanism.
-            // Thread-safety not guaranteed at this point.
-            //
-            // log_error_fallback();
-
-            *p_status = status;
-            return;
-        }
-    }
-
-    //
-    // Set the fact that the logger has now been initialized.
-    //
-    s_initialized = true;
+    get_logger().log(
+        p_log_level,
+        p_title,
+        p_message.c_str());
 }
 
 auto
 logger::flush() -> void
 {
-
+    // Pending implementation.
 }
+
+logger::logger()
+    : m_logging_engine{nullptr}
+{}
 
 auto
 logger::is_logger_initialized() -> bool
 {
+    std::shared_lock lock {m_lock};
 
+    return m_logging_engine != nullptr;
 }  
-
-logger::logger()
-{
-
-}
 
 auto
 logger::initialize(
-    const logger_configuration* p_logger_configuration) -> status_code
+    const logger_configuration& p_logger_configuration) -> status_code
 {
+    std::unique_lock lock {m_lock};
 
+    if (m_logging_engine != nullptr)
+    {
+        //
+        // The logging engine has already been initialized; nothing to do here.
+        //
+        log_error_fallback("SynapseLogger",
+            "The synapse logger has already been initialized.");
+
+        return status::logger_already_initialized;
+    }
+
+    std::unique_ptr<logging_engine> current_logging_engine = std::make_unique<logging_engine>();
+
+    status_code status {current_logging_engine->initialize(p_logger_configuration)};
+
+    if (status::failed(status))
+    {
+        //
+        // Initialization failed; do not update the internal logging engine.
+        //
+        log_error_fallback("SynapseLogger",
+            "The synapse logger encountered an error during the initialization process.");
+
+        return status;
+    }
+
+    m_logging_engine = std::move(current_logging_engine);
+}
+
+auto
+logger::log(
+    const log_level& p_log_level,
+    const char* p_title,
+    const char* p_message) -> void
+{
+    std::shared_lock lock {m_lock};
+
+    if (m_logging_engine == nullptr)
+    {
+        //
+        // The logging engine is not yet initialized; nothing to do here.
+        //
+        log_error_fallback("SynapseLogger",
+            "The synapse logger is not yet initialized.");
+
+        return;
+    }
+
+    m_logging_engine->log(
+        p_log_level,
+        p_title,
+        p_message);
+}
+
+auto
+logger::get_logger() -> logger&
+{
+    static logger singleton_logger_instance;
+
+    return singleton_logger_instance;
+}
+
+auto
+logger::log_error_fallback(
+    const char* p_title,
+    const char* p_message) -> void
+{
+    const std::string formatted_message = "<!> Error: " + std::string(p_message) + "\n";
+    log_error_to_syslog(p_title, formatted_message.c_str());
+    log_error_to_console(formatted_message.c_str());
+}
+
+auto
+logger::log_error_to_console(
+    const char* p_message) -> void
+{
+    std::cerr << p_message;
+}
+
+auto
+logger::log_error_to_syslog(
+    const char* p_title,
+    const char* p_message) -> void
+{
+    openlog(p_title, LOG_PID | LOG_CONS, LOG_USER);
+    syslog(LOG_ERR, "%s", p_message);
+    closelog();
 }
 
 } // namespace syp.
