@@ -8,8 +8,9 @@
 
 #pragma once
 
-#include "status.hh"
 #include "log_level.hh"
+#include "../status/status.hh"
+#include "logger_configuration.hh"
 
 namespace syp
 {

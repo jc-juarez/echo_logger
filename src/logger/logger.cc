@@ -6,8 +6,6 @@
 // This source code is licensed under the MIT license.
 // ****************************************************
 
-#pragma once
-
 #include <mutex>
 #include <string>
 #include <iostream>
@@ -21,7 +19,7 @@ namespace syp
 auto
 logger::is_logger_initialized() -> bool
 {
-    return get_logger().is_logger_initialized();
+    return get_logger().is_logger_initialized_implementation();
 }
 
 auto
@@ -38,19 +36,7 @@ logger::initialize(
         p_logger_configuration = &default_logger_configuration;
     }
 
-    return get_logger().initialize(*p_logger_configuration);
-}
-
-auto
-logger::log(
-    const log_level& p_log_level,
-    const char* p_title,
-    const std::string&& p_message) -> void
-{
-    get_logger().log(
-        p_log_level,
-        p_title,
-        p_message.c_str());
+    return get_logger().initialize_implementation(*p_logger_configuration);
 }
 
 auto
@@ -64,7 +50,7 @@ logger::logger()
 {}
 
 auto
-logger::is_logger_initialized() -> bool
+logger::is_logger_initialized_implementation() -> bool
 {
     std::shared_lock lock {m_lock};
 
@@ -72,7 +58,7 @@ logger::is_logger_initialized() -> bool
 }  
 
 auto
-logger::initialize(
+logger::initialize_implementation(
     const logger_configuration& p_logger_configuration) -> status_code
 {
     std::unique_lock lock {m_lock};
@@ -104,10 +90,12 @@ logger::initialize(
     }
 
     m_logging_engine = std::move(current_logging_engine);
+
+    return status::success;
 }
 
 auto
-logger::log(
+logger::log_implementation(
     const log_level& p_log_level,
     const char* p_title,
     const char* p_message) -> void

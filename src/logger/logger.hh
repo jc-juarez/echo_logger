@@ -47,13 +47,24 @@ public:
     //
     // Logs a message.
     // Expects that the title is valid for the lifetime of the program.
+    // Generates a compile-time error on failed format validations.
     //
+    template<typename... Args>
     static
     auto
     log(
         const log_level& p_log_level,
         const char* p_title,
-        const std::string&& p_message) -> void;
+        std::format_string<Args...> p_format,
+        Args&&... p_args) -> void
+    {
+        const std::string formatted_message = std::format(p_format, std::forward<Args>(p_args)...);
+
+        get_logger().log_implementation(
+            p_log_level,
+            p_title,
+            formatted_message.c_str());
+    }
 
     //
     // Flushes the current contents of the memory buffer to the filesystem.
@@ -73,20 +84,20 @@ private:
     // Gets the logger initialization status.
     //
     auto
-    is_logger_initialized() -> bool;  
+    is_logger_initialized_implementation() -> bool;  
 
     //
     // Initializes the singleton logger instance.
     //
     auto
-    initialize(
+    initialize_implementation(
         const logger_configuration& p_logger_configuration) -> status_code;
 
     //
     // Logs a message through the singleton logger instance.
     //
     auto
-    log(
+    log_implementation(
         const log_level& p_log_level,
         const char* p_title,
         const char* p_message) -> void;
@@ -138,48 +149,5 @@ private:
     mutable std::shared_mutex m_lock;
 
 };
-
-//
-// Log info message macro.
-//
-#define log_info_message(p_title, p_format, ...) \
-    do \
-    { \
-        assert(logger::is_logger_initialized()); \
-        logger::log(log_level::info, p_title, std::format(p_format, ##__VA_ARGS__)); \
-    } \
-    while (false)
-
-//
-// Log warning message macro.
-//
-#define log_warning_message(p_title, p_format, ...) \
-    do \
-    { \
-        assert(logger::is_logger_initialized()); \
-        logger::log(log_level::warning, p_title, std::format(p_format, ##__VA_ARGS__)); \
-    } \
-    while (false)
-
-//
-// Log error message macro.
-//
-#define log_error_message(p_title, p_format, ...) \
-    do \
-    { \
-        assert(logger::is_logger_initialized()); \
-        logger::log(log_level::error, p_title, std::format(p_format, ##__VA_ARGS__)); \
-    } \
-    while (false)
-
-//
-// Log critical message macro.
-//
-#define log_critical_message(p_title, p_format, ...) \
-    do \
-    { \
-        logger::log(log_level::critical, p_title, std::format(p_format, ##__VA_ARGS__)); \
-    } \
-    while (false)
 
 } // namespace syp.

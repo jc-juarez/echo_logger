@@ -1,0 +1,3 @@
+/home/jcjuarez/synapse/build/CMakeFiles/rebuild_cache.dir
+/home/jcjuarez/synapse/build/CMakeFiles/edit_cache.dir
+/home/jcjuarez/synapse/build/CMakeFiles/astra.dir

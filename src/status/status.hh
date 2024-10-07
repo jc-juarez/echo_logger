@@ -22,6 +22,21 @@ namespace status
 {
 
 //
+// Status code definition macro.
+//
+#define status_code_definition(p_status_code_name, p_status_code_value) static constexpr status_code p_status_code_name = p_status_code_value
+
+//
+// Operation succeeded.
+//
+status_code_definition(success, 0x0'0000000);
+
+//
+// Generic operation failed.
+//
+status_code_definition(fail, 0x8'0000000);
+
+//
 // Determines whether a given status is considered as failure.
 //
 inline
@@ -67,20 +82,11 @@ are_not_equal(
     return p_status_code_left != p_status_code_right;
 }
 
+/*
 //
-// Status code definition macro.
+// Library-defined status codes.
 //
-#define status_code_definition(p_status_code_name, p_status_code_value) static constexpr status_code p_status_code_name = p_status_code_value
-
-//
-// Operation succeeded.
-//
-status_code_definition(success, 0x0'0000000);
-
-//
-// Generic operation failed.
-//
-status_code_definition(fail, 0x8'0000000);
+*/
 
 //
 // Logger is not yet initialized.

@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/jcjuarez/synapse/main.cc
+src/logger/logger.hh
+/home/jcjuarez/synapse/src/logger/logger.hh
+
+/home/jcjuarez/synapse/src/logger/log_level.hh
+cstdint
+-
+
+/home/jcjuarez/synapse/src/logger/logger.hh
+format
+-
+memory
+-
+cassert
+-
+shared_mutex
+-
+log_level.hh
+/home/jcjuarez/synapse/src/logger/log_level.hh
+../status/status.hh
+/home/jcjuarez/synapse/src/status/status.hh
+logger_configuration.hh
+/home/jcjuarez/synapse/src/logger/logger_configuration.hh
+
+/home/jcjuarez/synapse/src/logger/logger_configuration.hh
+filesystem
+-
+
+/home/jcjuarez/synapse/src/status/status.hh
+cstdint
+-
+

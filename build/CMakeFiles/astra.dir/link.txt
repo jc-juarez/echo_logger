@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/astra.dir/main.cc.o CMakeFiles/astra.dir/src/logger/logger.cc.o CMakeFiles/astra.dir/src/logger/logging_engine.cc.o  -o astra 
