@@ -39,7 +39,12 @@ struct logger_configuration
     bool m_log_to_syslog_on_failure;
 
     //
-    // Path to the directory for storing logs files.
+    // Flag for determining if the loggger will work on sync or async mode.
+    //
+    bool m_async_mode_enabled;
+
+    //
+    // Path to the directory where the logging session directory will be created.
     //
     std::filesystem::path m_logs_directory_path;
 

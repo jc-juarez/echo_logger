@@ -15,6 +15,7 @@
 #include "log_level.hh"
 #include "../status/status.hh"
 #include "logger_configuration.hh"
+#include "title_and_source_location.hh"
 
 namespace syp
 {
@@ -42,6 +43,7 @@ public:
     static
     auto
     initialize(
+        const std::string p_component_name = "synapse",
         logger_configuration* p_logger_configuration = nullptr) -> status_code;
 
     //
@@ -54,7 +56,7 @@ public:
     auto
     log(
         const log_level& p_log_level,
-        const char* p_title,
+        title_and_source_location p_title_and_source_location,
         std::format_string<Args...> p_format,
         Args&&... p_args) -> void
     {
@@ -62,7 +64,8 @@ public:
 
         get_logger().log_implementation(
             p_log_level,
-            p_title,
+            p_title_and_source_location.m_source_location,
+            p_title_and_source_location.m_title,
             formatted_message.c_str());
     }
 
@@ -91,6 +94,7 @@ private:
     //
     auto
     initialize_implementation(
+        const char* p_component_name,
         const logger_configuration& p_logger_configuration) -> status_code;
 
     //
@@ -99,6 +103,7 @@ private:
     auto
     log_implementation(
         const log_level& p_log_level,
+        const std::source_location& p_source_location,
         const char* p_title,
         const char* p_message) -> void;
 

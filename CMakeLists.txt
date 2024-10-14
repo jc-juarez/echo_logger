@@ -16,6 +16,7 @@ set(SOURCE_FILES
     main.cc
     src/logger/logger.cc
     src/logger/logging_engine.cc
+    src/uuid/uuid_utilities.cc
 )
 
 add_executable(astra ${SOURCE_FILES})

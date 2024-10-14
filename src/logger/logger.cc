@@ -24,6 +24,7 @@ logger::is_logger_initialized() -> bool
 
 auto
 logger::initialize(
+    const std::string p_component_name,
     logger_configuration* p_logger_configuration) -> status_code
 {
     logger_configuration default_logger_configuration;
@@ -36,7 +37,9 @@ logger::initialize(
         p_logger_configuration = &default_logger_configuration;
     }
 
-    return get_logger().initialize_implementation(*p_logger_configuration);
+    return get_logger().initialize_implementation(
+        p_component_name.c_str(),
+        *p_logger_configuration);
 }
 
 auto
@@ -59,6 +62,7 @@ logger::is_logger_initialized_implementation() -> bool
 
 auto
 logger::initialize_implementation(
+    const char* p_component_name,
     const logger_configuration& p_logger_configuration) -> status_code
 {
     std::unique_lock lock {m_lock};
@@ -76,7 +80,9 @@ logger::initialize_implementation(
 
     std::unique_ptr<logging_engine> current_logging_engine = std::make_unique<logging_engine>();
 
-    status_code status {current_logging_engine->initialize(p_logger_configuration)};
+    status_code status {current_logging_engine->initialize(
+        p_component_name,
+        p_logger_configuration)};
 
     if (status::failed(status))
     {
@@ -97,6 +103,7 @@ logger::initialize_implementation(
 auto
 logger::log_implementation(
     const log_level& p_log_level,
+    const std::source_location& p_source_location,
     const char* p_title,
     const char* p_message) -> void
 {
@@ -115,6 +122,7 @@ logger::log_implementation(
 
     m_logging_engine->log(
         p_log_level,
+        p_source_location,
         p_title,
         p_message);
 }
