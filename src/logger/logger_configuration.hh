@@ -22,6 +22,7 @@ struct logger_configuration
 
     //
     // Constructor.
+    // Default configurations specified here.
     //
     logger_configuration()
         : debug_mode_enabled{true},
@@ -30,7 +31,7 @@ struct logger_configuration
           async_mode_enabled{false},
           utc_enabled{true},
           component_name{"EchoLogger"},
-          flush_frequency_ms{1'000},
+          flush_frequency_ms{1'000u},
           include_source_location{true}
     {}
 

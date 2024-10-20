@@ -38,7 +38,8 @@ public:
     is_logger_initialized() -> bool;  
 
     //
-    // Initializes singleton logger instance.
+    // Initializes the singleton logger instance.
+    // Throws if the initialization process fails.
     //
     static
     auto

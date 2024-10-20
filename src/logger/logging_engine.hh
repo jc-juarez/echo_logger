@@ -100,22 +100,22 @@ private:
     //
     // Flag for determining whether debug mode is enabled for the logger instance.
     //
-    bool m_debug_mode_enabled;
+    const bool m_debug_mode_enabled;
 
     //
     // Flag for determining if logs should be flushed to syslog in case of failure.
     //
-    bool m_log_to_syslog_on_failure;
+    const bool m_log_to_syslog_on_failure;
 
     //
     // Component name.
     //
-    std::string m_component_name;
+    const std::string m_component_name;
 
     //
     // Flag for determining if the loggger will work on sync or async mode.
     //
-    bool m_async_mode_enabled;
+    const bool m_async_mode_enabled;
 
     //
     // Logging session identifier.
@@ -125,7 +125,7 @@ private:
     //
     // Path to the directory where the logs for the logging session will be stored.
     //
-    std::filesystem::path m_logging_session_directory_path;
+    const std::filesystem::path m_logging_session_directory_path;
 
     //
     // Process ID for the logging session.

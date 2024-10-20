@@ -16,21 +16,17 @@ namespace echo
 
 logging_engine::logging_engine(
     const logger_configuration& p_logger_configuration)
-    : m_filesystem_writer{},
-      m_process_id{getpid()},
+    : m_component_name{p_logger_configuration.component_name},
       m_session_id{uuid_to_string(generate_uuid())},
-      m_component_name{p_logger_configuration.component_name},
+      m_logging_session_directory_path{
+        std::filesystem::absolute(p_logger_configuration.logs_directory_path) /
+        std::string(m_component_name + "-logs-" + m_session_id)},
+      m_filesystem_writer{m_session_id, m_logging_session_directory_path},
+      m_process_id{getpid()},
       m_debug_mode_enabled{p_logger_configuration.debug_mode_enabled},
       m_log_to_syslog_on_failure{p_logger_configuration.log_to_syslog_on_failure},
       m_async_mode_enabled{p_logger_configuration.async_mode_enabled}
 {
-    //
-    // Define the path to the directory where the actual logs will be stored.
-    //
-    const std::filesystem::path logs_directory_path = std::filesystem::absolute(p_logger_configuration.logs_directory_path);
-    m_logging_session_directory_path = logs_directory_path;
-    m_logging_session_directory_path.append(m_component_name + "-logs-" + m_session_id);
-    
     //
     // Can throw if the directory creation was not possible.
     //
@@ -65,10 +61,12 @@ logging_engine::log(
     if (!m_async_mode_enabled)
     {
         //
-        // Sync mode is specified. Write
-        // the log message directly to disk.
+        // Sync mode is specified. Write the log
+        // message directly to disk and cut the operation.
+        // Performance of async mode logging is much greater.
+        // Consider switching to async mode for production workloads.
         //
-        // log();
+        m_filesystem_writer.write_log_message_to_disk(log_message.c_str());
 
         return;
     }
