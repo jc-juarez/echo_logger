@@ -1,6 +1,6 @@
-# Synapse C++ Library 🥏
+# Echo Logger C++ Library 🥏
 
-`The Synapse C++ Library implementation.`
+`The Echo Logger C++ Library implementation.`
 
 Current support:
 * Logger

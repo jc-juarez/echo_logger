@@ -1,5 +1,5 @@
 // ****************************************************
-// Synapse C++ Library
+// Echo Logger C++ Library
 // Logger
 // 'logger.hh'
 // Author: jcjuarez
@@ -17,7 +17,7 @@
 #include "logger_configuration.hh"
 #include "title_and_source_location.hh"
 
-namespace syp
+namespace echo
 {
 
 class logging_engine;
@@ -43,8 +43,7 @@ public:
     static
     auto
     initialize(
-        const std::string p_component_name = "synapse",
-        logger_configuration* p_logger_configuration = nullptr) -> status_code;
+        logger_configuration* p_logger_configuration = nullptr) -> void;
 
     //
     // Logs a message.
@@ -71,6 +70,7 @@ public:
 
     //
     // Flushes the current contents of the memory buffer to the filesystem.
+    // Only applies for async mode logging.
     //
     static
     auto
@@ -94,8 +94,7 @@ private:
     //
     auto
     initialize_implementation(
-        const char* p_component_name,
-        const logger_configuration& p_logger_configuration) -> status_code;
+        const logger_configuration& p_logger_configuration) -> void;
 
     //
     // Logs a message through the singleton logger instance.
@@ -155,4 +154,4 @@ private:
 
 };
 
-} // namespace syp.
+} // namespace echo.

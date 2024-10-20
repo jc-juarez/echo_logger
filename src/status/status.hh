@@ -1,5 +1,5 @@
 // ****************************************************
-// Synapse C++ Library
+// Echo Logger C++ Library
 // Status
 // 'status.hh'
 // Author: jcjuarez
@@ -10,7 +10,7 @@
 
 #include <cstdint>
 
-namespace syp
+namespace echo
 {
 
 //
@@ -124,4 +124,4 @@ status_code_definition(file_write_failed, 0x8'0000006);
 status_code_definition(logging_incremental_search_failed, 0x8'0000007);
 
 } // namespace status.
-} // namespace syp.
+} // namespace echo.

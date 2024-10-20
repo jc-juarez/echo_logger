@@ -1,5 +1,5 @@
 // ****************************************************
-// Synapse C++ Library
+// Echo Logger C++ Library
 // Logger
 // 'log_level.hh'
 // Author: jcjuarez
@@ -10,7 +10,7 @@
 
 #include <cstdint>
 
-namespace syp
+namespace echo
 {
 
 //
@@ -45,4 +45,4 @@ enum class log_level : std::uint8_t
     
 };
 
-} // namespace syp.
+} // namespace echo.

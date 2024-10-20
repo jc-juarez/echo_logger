@@ -1,5 +1,5 @@
 // ****************************************************
-// Synapse C++ Library
+// Echo Logger C++ Library
 // Logger
 // 'logger.cc'
 // Author: jcjuarez
@@ -13,7 +13,7 @@
 #include "logger.hh"
 #include "logging_engine.hh"
 
-namespace syp
+namespace echo
 {
 
 auto
@@ -24,8 +24,7 @@ logger::is_logger_initialized() -> bool
 
 auto
 logger::initialize(
-    const std::string p_component_name,
-    logger_configuration* p_logger_configuration) -> status_code
+    logger_configuration* p_logger_configuration) -> void
 {
     logger_configuration default_logger_configuration;
 
@@ -37,8 +36,7 @@ logger::initialize(
         p_logger_configuration = &default_logger_configuration;
     }
 
-    return get_logger().initialize_implementation(
-        p_component_name.c_str(),
+    get_logger().initialize_implementation(
         *p_logger_configuration);
 }
 
@@ -62,8 +60,7 @@ logger::is_logger_initialized_implementation() -> bool
 
 auto
 logger::initialize_implementation(
-    const char* p_component_name,
-    const logger_configuration& p_logger_configuration) -> status_code
+    const logger_configuration& p_logger_configuration) -> void
 {
     std::unique_lock lock {m_lock};
 
@@ -72,32 +69,11 @@ logger::initialize_implementation(
         //
         // The logging engine has already been initialized; nothing to do here.
         //
-        log_error_fallback("SynapseLogger",
-            "The synapse logger has already been initialized.");
-
-        return status::logger_already_initialized;
+        throw std::logic_error("The echo logger has already been initialized.");
     }
 
-    std::unique_ptr<logging_engine> current_logging_engine = std::make_unique<logging_engine>();
-
-    status_code status {current_logging_engine->initialize(
-        p_component_name,
-        p_logger_configuration)};
-
-    if (status::failed(status))
-    {
-        //
-        // Initialization failed; do not update the internal logging engine.
-        //
-        log_error_fallback("SynapseLogger",
-            "The synapse logger encountered an error during the initialization process.");
-
-        return status;
-    }
-
-    m_logging_engine = std::move(current_logging_engine);
-
-    return status::success;
+    m_logging_engine = std::make_unique<logging_engine>(
+        p_logger_configuration);
 }
 
 auto
@@ -114,10 +90,7 @@ logger::log_implementation(
         //
         // The logging engine is not yet initialized; nothing to do here.
         //
-        log_error_fallback("SynapseLogger",
-            "The synapse logger is not yet initialized.");
-
-        return;
+        throw std::logic_error("The echo logger is not yet initialized.");
     }
 
     m_logging_engine->log(
@@ -162,4 +135,4 @@ logger::log_error_to_syslog(
     closelog();
 }
 
-} // namespace syp.
+} // namespace echo.

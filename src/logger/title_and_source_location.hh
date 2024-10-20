@@ -1,5 +1,5 @@
 // ****************************************************
-// Synapse C++ Library
+// Echo Logger C++ Library
 // Logger
 // 'title_and_source_location.hh'
 // Author: jcjuarez
@@ -11,7 +11,7 @@
 #include <format>
 #include <source_location>
 
-namespace syp
+namespace echo
 {
 
 //
@@ -43,4 +43,4 @@ struct title_and_source_location
 
 };
 
-} // namespace syp.
+} // namespace echo.

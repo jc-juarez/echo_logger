@@ -1,5 +1,5 @@
 // ****************************************************
-// Synapse C++ Library
+// Echo Logger C++ Library
 // Logger
 // 'logger_configuration.hh'
 // Author: jcjuarez
@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 
-namespace syp
+namespace echo
 {
 
 //
-// Logger configuration container for storing logger startup options.
+// Logger configuration container for specifying logger startup options.
 //
 struct logger_configuration
 {
@@ -23,41 +24,60 @@ struct logger_configuration
     // Constructor.
     //
     logger_configuration()
-        : m_debug_mode_enabled{c_default_debug_mode_enabled},
-          m_log_to_syslog_on_failure{c_default_log_to_syslog_on_failure},
-          m_logs_directory_path{std::filesystem::current_path()}
+        : debug_mode_enabled{true},
+          log_to_syslog_on_failure{true},
+          logs_directory_path{std::filesystem::current_path()},
+          async_mode_enabled{false},
+          utc_enabled{true},
+          component_name{"EchoLogger"},
+          flush_frequency_ms{1'000},
+          include_source_location{true}
     {}
 
     //
     // Flag for determining whether debug mode is enabled for the logger instance.
+    // This will produce console output for debugging purposes. Because of practical
+    // synchronization requirements for the standard output stream, exclusive locking is
+    // introduced for this option, which can cause contention in highly concurrent scenarios.
+    // Limit its use strictly for debugging situations.  
     //
-    bool m_debug_mode_enabled;
+    bool debug_mode_enabled;
 
     //
     // Flag for determining if logs should be flushed to syslog in case of failure.
     //
-    bool m_log_to_syslog_on_failure;
+    bool log_to_syslog_on_failure;
 
     //
     // Flag for determining if the loggger will work on sync or async mode.
     //
-    bool m_async_mode_enabled;
+    bool async_mode_enabled;
+
+    //
+    // Flag for determining if the loggger will use UTC or local time for logs.
+    //
+    bool utc_enabled;
 
     //
     // Path to the directory where the logging session directory will be created.
     //
-    std::filesystem::path m_logs_directory_path;
+    std::filesystem::path logs_directory_path;
 
     //
-    // Default log to syslog on failure value.
+    // Component name to be used by the logger for service identification.
     //
-    static constexpr bool c_default_log_to_syslog_on_failure = true;
+    std::string component_name;
 
     //
-    // Default debug mode enabled value.
+    // Disk flush frequency in milliseconds. Only applies for async mode logging.
     //
-    static constexpr bool c_default_debug_mode_enabled = true;
+    std::uint32_t flush_frequency_ms;
+
+    //
+    // Flag for determining if source location details should be included in the log message.
+    //
+    bool include_source_location;
 
 };
 
-} // namespace syp.
+} // namespace echo.

@@ -4,7 +4,7 @@ namespace foo
 {
 void func()
 {
-    syp::logger::log(syp::log_level::warning,
+    echo::logger::log(echo::log_level::warning,
         "Main",
         "Hello World! {}, {}",
         45,
@@ -14,9 +14,15 @@ void func()
 
 int main()
 {
-    syp::logger::initialize();
+    echo::logger_configuration config;
+
+    config.flush_frequency_ms = 10'000;
+    config.component_name = "NexusMasterIndex";
+    config.logs_directory_path = "/home/jcjuarez/NexusMasterIndexLogs";
+
+    echo::logger::initialize(&config);
 
     foo::func();
 
-    syp::logger::flush();
+    echo::logger::flush();
 }
