@@ -1,6 +1,3 @@
-# Echo Logger C++ Library 🥏
+# Echo Logger 🫧
 
-`The Echo Logger C++ Library implementation.`
-
-Current support:
-* Logger
+`Echo. Fast and efficient logger for C++.`
