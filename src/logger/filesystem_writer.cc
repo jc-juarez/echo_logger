@@ -22,6 +22,19 @@ filesystem_writer::filesystem_writer(
       m_pointed_logs_file_path{get_pointed_logs_file_path()}
 {}
 
+/*
+The Lord Speaks.
+
+“Brace yourself like a man;
+    I will question you,
+    and you shall answer me.
+Can you bind the chains of the Pleiades?
+    Can you loosen Orion’s belt?
+Can you bring forth the constellations in their seasons
+    or lead out the Bear with its cubs?
+Do you know the laws of the heavens?"
+*/
+
 auto
 filesystem_writer::write_log_message_to_disk(
     const char* p_log_message) -> status_code
